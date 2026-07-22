@@ -1,9 +1,9 @@
 import React from 'react';
 import { 
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, Legend, ResponsiveContainer,
-  LineChart, Line, AreaChart, Area
+  AreaChart, Area
 } from 'recharts';
-import { Brain, FileText, Database } from 'lucide-react';
+import { Brain, Database } from 'lucide-react';
 
 const mockModelMetrics = [
   { name: 'Normal', precision: 99.2, recall: 98.5, f1: 98.8 },

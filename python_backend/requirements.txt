@@ -1,4 +1,16 @@
+fastapi
+uvicorn[standard]
+sqlalchemy
+psycopg2-binary
 pandas
 numpy
 scikit-learn
-joblib
+pandas==2.2.2
+numpy<2
+scikit-learn==1.4.2
+joblib==1.5.1
+psycopg2-binary==2.9.11
+fastapi==0.110.0
+uvicorn==0.24.0
+sqlalchemy==2.0.23
+passlib[bcrypt]==1.7.4

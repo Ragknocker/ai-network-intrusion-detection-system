@@ -1,7 +1,7 @@
 import React from 'react';
 import { ShieldAlert, Activity, Database, Settings } from 'lucide-react';
 
-const Navbar = ({ activeTab, setActiveTab, threatLevel }) => {
+const Navbar = ({ activeTab, setActiveTab, threatLevel, onOpenSettings }) => {
   return (
     <nav className="glass-panel mx-6 mt-6 p-4 flex justify-between items-center z-50">
       <div className="flex items-center gap-3">
@@ -36,12 +36,17 @@ const Navbar = ({ activeTab, setActiveTab, threatLevel }) => {
           <div className={`w-2 h-2 rounded-full ${threatLevel === 'Critical' ? 'bg-cyber-danger animate-ping' : threatLevel === 'High' ? 'bg-cyber-warning' : 'bg-cyber-success'}`}></div>
           <span className="font-mono text-xs uppercase tracking-widest text-gray-300">Status: {threatLevel}</span>
         </div>
-        <button className="p-2 text-gray-400 hover:text-cyber-primary transition-colors">
+        <button 
+          onClick={onOpenSettings}
+          className="p-2 text-gray-400 hover:text-cyber-primary hover:bg-white/5 rounded transition-colors"
+          title="Settings"
+        >
           <Settings size={20} />
         </button>
       </div>
     </nav>
   );
 };
+
 
 export default Navbar;

@@ -36,7 +36,7 @@ def train_rf_model():
     print("\n--- Model Performance ---")
     print(f"Accuracy: {accuracy_score(y_test, y_pred):.4f}")
     print("\nClassification Report:")
-    print(classification_report(y_test, y_pred))
+    print(classification_report(y_test, y_pred, zero_division=0))
     print("\nConfusion Matrix:")
     print(confusion_matrix(y_test, y_pred))
 

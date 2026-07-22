@@ -14,7 +14,7 @@ const AttackButton = ({ label, icon: Icon, type, colorClass }) => (
   </button>
 );
 
-const AttackSimulator = ({ onTriggerAttack }) => {
+const AttackSimulator = ({ _onTriggerAttack }) => {
   return (
     <div className="glass-panel flex-1 flex flex-col">
       <div className="p-3 border-b border-cyber-border bg-black/40">

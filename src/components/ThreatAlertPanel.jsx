@@ -1,7 +1,7 @@
 import React from 'react';
 import { ShieldAlert, Trash2, ShieldX } from 'lucide-react';
 
-const ThreatAlertPanel = ({ alerts, onClear }) => {
+const ThreatAlertPanel = ({ alerts, onClear, onBlockIP }) => {
   return (
     <div className="glass-panel flex-1 flex flex-col overflow-hidden max-h-[500px]">
       <div className="p-3 border-b border-cyber-border flex justify-between items-center bg-black/40">
@@ -59,8 +59,16 @@ const ThreatAlertPanel = ({ alerts, onClear }) => {
               )}
 
               <div className="flex gap-2 mt-2">
-                <button className="flex-1 py-1.5 text-xs font-mono rounded bg-cyber-danger/20 hover:bg-cyber-danger/40 border border-cyber-danger/50 transition-colors flex items-center justify-center gap-1 text-white">
-                  <ShieldX size={14} /> BLOCK IP
+                <button 
+                  onClick={() => onBlockIP && onBlockIP(alert.source)}
+                  disabled={alert.isBlocked}
+                  className={`flex-1 py-1.5 text-xs font-mono rounded border transition-colors flex items-center justify-center gap-1 ${
+                    alert.isBlocked 
+                      ? 'bg-gray-800 border-gray-600 text-gray-500 cursor-not-allowed' 
+                      : 'bg-cyber-danger/20 hover:bg-cyber-danger/40 border-cyber-danger/50 text-white'
+                  }`}
+                >
+                  <ShieldX size={14} /> {alert.isBlocked ? 'BLOCKED' : 'BLOCK IP'}
                 </button>
               </div>
             </div>
@@ -70,5 +78,6 @@ const ThreatAlertPanel = ({ alerts, onClear }) => {
     </div>
   );
 };
+
 
 export default ThreatAlertPanel;

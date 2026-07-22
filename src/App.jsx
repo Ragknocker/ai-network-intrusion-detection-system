@@ -1,14 +1,24 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import Navbar from './components/Navbar';
 import MetricsOverview from './components/MetricsOverview';
 import LiveTrafficMonitor from './components/LiveTrafficMonitor';
 import ThreatAlertPanel from './components/ThreatAlertPanel';
 import AttackSimulator from './components/AttackSimulator';
 import ModelPerformance from './components/ModelPerformance';
+import SettingsModal from './components/SettingsModal';
 
 function App() {
   const [activeTab, setActiveTab] = useState('dashboard');
   const [alerts, setAlerts] = useState([]);
+  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+  const [blockedIPs, setBlockedIPs] = useState([]);
+  const [settings, setSettings] = useState({
+    lambdaUrl: import.meta.env.VITE_LAMBDA_API_URL || 'https://mukpvdcdcsb6kfq5swwujk4vra0jizgi.lambda-url.eu-north-1.on.aws/',
+    useLiveLambda: true,
+    sensitivityThreshold: 75,
+    autoBlockCritical: false
+  });
+
   const [metrics, setMetrics] = useState({
     bandwidth: 0,
     packetRate: 0,
@@ -18,9 +28,42 @@ function App() {
   });
 
   // Global state for traffic stream
-  const [trafficStream, setTrafficStream] = useState([]);
-  
+  const [_trafficStream, setTrafficStream] = useState([]);
+
+  const handleBlockIP = (ipToBlock) => {
+    if (!ipToBlock) return;
+    setBlockedIPs(prev => {
+      if (prev.includes(ipToBlock)) return prev;
+      const updated = [...prev, ipToBlock];
+      setMetrics(m => ({ ...m, blockedIPs: updated.length }));
+      return updated;
+    });
+
+    setAlerts(prevAlerts => 
+      prevAlerts.map(alert => 
+        alert.source === ipToBlock ? { ...alert, isBlocked: true } : alert
+      )
+    );
+  };
+
+  const handleUnblockIP = (ipToUnblock) => {
+    setBlockedIPs(prev => {
+      const updated = prev.filter(ip => ip !== ipToUnblock);
+      setMetrics(m => ({ ...m, blockedIPs: updated.length }));
+      return updated;
+    });
+
+    setAlerts(prevAlerts => 
+      prevAlerts.map(alert => 
+        alert.source === ipToUnblock ? { ...alert, isBlocked: false } : alert
+      )
+    );
+  };
+
   const handleNewPacket = (packet) => {
+    // If source IP is blocked by firewall, count packet but do not generate new alerts
+    const isIPBlocked = blockedIPs.includes(packet.srcIP);
+    
     setTrafficStream(prev => [packet, ...prev].slice(0, 50));
     setMetrics(prev => ({
       ...prev,
@@ -29,17 +72,25 @@ function App() {
       packetRate: Math.floor(Math.random() * 50) + 100
     }));
 
-    if (packet.threatScore > 75) {
+    if (!isIPBlocked && packet.threatScore >= settings.sensitivityThreshold) {
+      const isCritical = packet.threatScore > 90;
+      
       handleNewAlert({
-        id: Date.now(),
+        id: Date.now() + Math.random(),
         type: packet.classification,
         source: packet.srcIP,
         target: packet.destIP,
-        severity: packet.threatScore > 90 ? 'Critical' : 'High',
-        timestamp: new Date().toISOString(),
+        severity: isCritical ? 'Critical' : 'High',
+        timestamp: new Date().toLocaleTimeString('en-US', { hour12: false, fractionalSecondDigits: 3 }),
         geo: packet.geo,
-        payloadInfo: packet.payloadInfo
+        payloadInfo: packet.payloadInfo,
+        isBlocked: false
       });
+
+      // Auto-block IP if setting enabled and threat is critical
+      if (isCritical && settings.autoBlockCritical) {
+        handleBlockIP(packet.srcIP);
+      }
     }
   };
 
@@ -57,8 +108,13 @@ function App() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col">
-      <Navbar activeTab={activeTab} setActiveTab={setActiveTab} threatLevel={metrics.threatLevel} />
+    <div className="min-h-screen flex flex-col bg-cyber-bg text-white">
+      <Navbar 
+        activeTab={activeTab} 
+        setActiveTab={setActiveTab} 
+        threatLevel={metrics.threatLevel}
+        onOpenSettings={() => setIsSettingsOpen(true)}
+      />
       
       <main className="flex-1 p-6 overflow-hidden flex flex-col max-w-[1600px] w-full mx-auto">
         {activeTab === 'dashboard' && (
@@ -73,10 +129,13 @@ function App() {
             
             {/* Right Column - Alerts & Simulator */}
             <div className="col-span-12 lg:col-span-4 flex flex-col gap-6">
-              <ThreatAlertPanel alerts={alerts} onClear={clearAlerts} />
+              <ThreatAlertPanel 
+                alerts={alerts} 
+                onClear={clearAlerts} 
+                onBlockIP={handleBlockIP}
+              />
               <AttackSimulator onTriggerAttack={(attack) => {
-                // Mock attack trigger logic to update UI
-                console.log("Triggered attack:", attack);
+                console.log("Triggered attack simulation:", attack);
               }} />
             </div>
           </div>
@@ -86,8 +145,19 @@ function App() {
           <ModelPerformance />
         )}
       </main>
+
+      {/* Settings Modal */}
+      <SettingsModal 
+        isOpen={isSettingsOpen}
+        onClose={() => setIsSettingsOpen(false)}
+        settings={settings}
+        onUpdateSettings={setSettings}
+        blockedIPs={blockedIPs}
+        onUnblockIP={handleUnblockIP}
+      />
     </div>
   );
 }
 
 export default App;
+

@@ -1,0 +1,19 @@
+FROM public.ecr.aws/lambda/python:3.12
+
+# Copy requirements file
+COPY python_backend/requirements.txt ${LAMBDA_TASK_ROOT}
+
+# Install dependencies into Lambda task root
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Copy Python backend code
+COPY python_backend/lambda_handler.py ${LAMBDA_TASK_ROOT}
+COPY python_backend/generate_dataset.py ${LAMBDA_TASK_ROOT}
+COPY python_backend/train_model.py ${LAMBDA_TASK_ROOT}
+
+# Generate synthetic dataset and train Random Forest model inside container
+RUN python generate_dataset.py && python train_model.py
+
+# Set the Lambda handler function
+CMD [ "lambda_handler.lambda_handler" ]
+

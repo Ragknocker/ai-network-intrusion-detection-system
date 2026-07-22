@@ -50,7 +50,7 @@ const LiveTrafficMonitor = ({ onNewPacket }) => {
         className="flex-1 overflow-y-auto p-4 font-mono text-xs space-y-1"
         style={{ scrollBehavior: 'smooth' }}
       >
-        {packets.map((packet, index) => (
+        {packets.map((packet) => (
           <div 
             key={packet.id} 
             className={`flex items-center gap-4 py-1 px-2 rounded 
