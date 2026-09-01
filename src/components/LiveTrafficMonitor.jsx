@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Terminal } from 'lucide-react';
+import { Terminal, Search } from 'lucide-react';
 import { generatePacket } from '../services/trafficGenerator';
 
-const LiveTrafficMonitor = ({ onNewPacket }) => {
+const LiveTrafficMonitor = ({ onNewPacket, onInspectPacket }) => {
   const [packets, setPackets] = useState([]);
   const [isPaused, setIsPaused] = useState(false);
   const scrollRef = useRef(null);
@@ -19,7 +19,7 @@ const LiveTrafficMonitor = ({ onNewPacket }) => {
         if (newPackets.length > 50) newPackets.shift();
         return newPackets;
       });
-    }, 800); // 800ms between packets for readable feed
+    }, 800);
 
     return () => clearInterval(interval);
   }, [isPaused, onNewPacket]);
@@ -53,7 +53,7 @@ const LiveTrafficMonitor = ({ onNewPacket }) => {
         {packets.map((packet) => (
           <div 
             key={packet.id} 
-            className={`flex items-center gap-4 py-1 px-2 rounded 
+            className={`flex items-center gap-4 py-1 px-2 rounded group
               ${packet.threatScore > 90 ? 'bg-cyber-danger/20 text-cyber-danger' : 
                 packet.threatScore > 50 ? 'bg-cyber-warning/20 text-cyber-warning' : 
                 'text-gray-400 hover:bg-white/5'} transition-colors`}
@@ -66,10 +66,31 @@ const LiveTrafficMonitor = ({ onNewPacket }) => {
             <span className="opacity-50">-{'>'}</span>
             <span className="w-32 truncate">{packet.destIP}:{packet.destPort}</span>
             
-            {packet.threatScore > 50 && (
+            {packet.threatScore > 50 ? (
               <span className="ml-auto font-bold animate-pulse">
                 [{packet.classification}] (Score: {packet.threatScore.toFixed(1)})
               </span>
+            ) : (
+              <span className="ml-auto text-gray-500 text-[11px] truncate max-w-[140px]">
+                {packet.payloadInfo}
+              </span>
+            )}
+
+            {onInspectPacket && (
+              <button
+                onClick={() => onInspectPacket({
+                  type: packet.classification === 'SQL Injection' || packet.classification === 'Zero-Day' ? 'code' : 'url',
+                  value: packet.classification === 'SQL Injection' 
+                    ? `function queryUser() {\n  const q = "SELECT * FROM users WHERE id = '${packet.srcIP}'";\n  eval(q);\n}`
+                    : `http://${packet.srcIP}/gateway/login.php?token=${packet.id}`,
+                  source: packet.srcIP,
+                  payload: packet.payloadInfo
+                })}
+                title="Inspect in URL Inspector"
+                className="opacity-0 group-hover:opacity-100 px-2 py-0.5 bg-cyber-primary/20 hover:bg-cyber-primary hover:text-black border border-cyber-primary/50 rounded text-[10px] text-cyber-primary transition-all flex items-center gap-1 shrink-0 ml-2 font-bold"
+              >
+                <Search size={10} /> Inspect
+              </button>
             )}
           </div>
         ))}

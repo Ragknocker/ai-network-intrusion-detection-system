@@ -1,5 +1,5 @@
 import React from 'react';
-import { ShieldAlert, Activity, Database, Settings } from 'lucide-react';
+import { ShieldAlert, Activity, Database, Settings, UploadCloud, Globe } from 'lucide-react';
 
 const Navbar = ({ activeTab, setActiveTab, threatLevel, onOpenSettings }) => {
   return (
@@ -21,6 +21,20 @@ const Navbar = ({ activeTab, setActiveTab, threatLevel, onOpenSettings }) => {
             ${activeTab === 'dashboard' ? 'bg-cyber-primary/20 text-cyber-primary border border-cyber-primary/50' : 'text-gray-400 hover:text-white'}`}
         >
           <Activity size={16} /> Live Dashboard
+        </button>
+        <button 
+          onClick={() => setActiveTab('file-scanner')}
+          className={`flex items-center gap-2 px-4 py-2 rounded transition-all duration-300 font-mono text-sm
+            ${activeTab === 'file-scanner' ? 'bg-cyber-primary/20 text-cyber-primary border border-cyber-primary/50' : 'text-gray-400 hover:text-white'}`}
+        >
+          <UploadCloud size={16} /> File Threat Scanner
+        </button>
+        <button 
+          onClick={() => setActiveTab('url-inspector')}
+          className={`flex items-center gap-2 px-4 py-2 rounded transition-all duration-300 font-mono text-sm
+            ${activeTab === 'url-inspector' ? 'bg-cyber-primary/20 text-cyber-primary border border-cyber-primary/50' : 'text-gray-400 hover:text-white'}`}
+        >
+          <Globe size={16} /> URL Inspector
         </button>
         <button 
           onClick={() => setActiveTab('models')}
@@ -47,6 +61,5 @@ const Navbar = ({ activeTab, setActiveTab, threatLevel, onOpenSettings }) => {
     </nav>
   );
 };
-
 
 export default Navbar;

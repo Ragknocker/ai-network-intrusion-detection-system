@@ -5,6 +5,8 @@ import LiveTrafficMonitor from './components/LiveTrafficMonitor';
 import ThreatAlertPanel from './components/ThreatAlertPanel';
 import AttackSimulator from './components/AttackSimulator';
 import ModelPerformance from './components/ModelPerformance';
+import FileThreatScanner from './components/FileThreatScanner';
+import UrlInspector from './components/UrlInspector';
 import SettingsModal from './components/SettingsModal';
 
 function App() {
@@ -12,6 +14,8 @@ function App() {
   const [alerts, setAlerts] = useState([]);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [blockedIPs, setBlockedIPs] = useState([]);
+  const [inspectTarget, setInspectTarget] = useState(null);
+
   const [settings, setSettings] = useState({
     lambdaUrl: import.meta.env.VITE_LAMBDA_API_URL || 'https://mukpvdcdcsb6kfq5swwujk4vra0jizgi.lambda-url.eu-north-1.on.aws/',
     useLiveLambda: true,
@@ -27,8 +31,12 @@ function App() {
     blockedIPs: 0
   });
 
-  // Global state for traffic stream
   const [_trafficStream, setTrafficStream] = useState([]);
+
+  const handleInspectPacket = (target) => {
+    setInspectTarget(target);
+    setActiveTab('url-inspector');
+  };
 
   const handleBlockIP = (ipToBlock) => {
     if (!ipToBlock) return;
@@ -61,7 +69,6 @@ function App() {
   };
 
   const handleNewPacket = (packet) => {
-    // If source IP is blocked by firewall, count packet but do not generate new alerts
     const isIPBlocked = blockedIPs.includes(packet.srcIP);
     
     setTrafficStream(prev => [packet, ...prev].slice(0, 50));
@@ -87,7 +94,6 @@ function App() {
         isBlocked: false
       });
 
-      // Auto-block IP if setting enabled and threat is critical
       if (isCritical && settings.autoBlockCritical) {
         handleBlockIP(packet.srcIP);
       }
@@ -123,7 +129,10 @@ function App() {
             <div className="col-span-12 lg:col-span-8 flex flex-col gap-6">
               <MetricsOverview metrics={metrics} />
               <div className="flex-1 min-h-[400px]">
-                <LiveTrafficMonitor onNewPacket={handleNewPacket} />
+                <LiveTrafficMonitor 
+                  onNewPacket={handleNewPacket} 
+                  onInspectPacket={handleInspectPacket}
+                />
               </div>
             </div>
             
@@ -139,6 +148,17 @@ function App() {
               }} />
             </div>
           </div>
+        )}
+
+        {activeTab === 'file-scanner' && (
+          <FileThreatScanner />
+        )}
+
+        {activeTab === 'url-inspector' && (
+          <UrlInspector 
+            inspectTarget={inspectTarget}
+            onClearTarget={() => setInspectTarget(null)}
+          />
         )}
 
         {activeTab === 'models' && (
@@ -160,4 +180,3 @@ function App() {
 }
 
 export default App;
-
