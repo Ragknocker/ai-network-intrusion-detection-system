@@ -26,3 +26,7 @@ dist-ssr
 # Python
 __pycache__/
 *.pyc
+*.pyo
+python_backend/__pycache__/
+python_backend/**/__pycache__/
+python_backend/quarantine/

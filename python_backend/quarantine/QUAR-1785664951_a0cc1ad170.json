@@ -1,8 +1,0 @@
-{
-  "id": "QUAR-1785664951",
-  "filename": "WannaCry_test.exe",
-  "sha256": "a0cc1ad1701e40bd138b249782945e93371b1d50a02ac50acd4c661b92011f38",
-  "threat_score": 95,
-  "quarantined_at": "2026-08-02T10:02:31Z",
-  "quarantine_file_path": "D:\\my projects\\ai-network-intrusion-detection-system\\python_backend\\modules\\file_scanner\\..\\..\\quarantine\\QUAR-1785664951_a0cc1ad170.bin"
-}

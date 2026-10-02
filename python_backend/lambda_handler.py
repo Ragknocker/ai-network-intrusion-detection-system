@@ -116,7 +116,7 @@ def analyze_code_payload(code_str):
 
     threat_score = min(100, risk_score)
     status = "Clean Code"
-    if threat_score > 60:
+    if threat_score >= 60:
         status = "Malicious Function / Exploit"
     elif threat_score > 20:
         status = "Suspicious Function"

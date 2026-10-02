@@ -1,89 +1,84 @@
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { describe, it, expect } from 'vitest';
 import React from 'react';
 import UrlInspector from './UrlInspector';
 
-describe('UrlInspector Component', () => {
-  it('renders URL Inspector header, top metrics, and input controls', () => {
+describe('UrlInspector Component (Accurate & Zero Preset Residue)', () => {
+  it('renders URL Inspector header, engine status, empty input, and prompt', () => {
     render(<UrlInspector />);
-    expect(screen.getByText(/URL & Function Inspector Dashboard/i)).toBeInTheDocument();
-    expect(screen.getByText(/Total Scanned URLs/i)).toBeInTheDocument();
-    expect(screen.getByText(/14-Stage Detection Pipeline Status:/i)).toBeInTheDocument();
+    expect(screen.getByText(/URL Threat Inspector/i)).toBeInTheDocument();
+    expect(screen.getByText(/ACCURATE REAL-TIME ENGINE/i)).toBeInTheDocument();
+    expect(screen.getByText(/Engine Active/i)).toBeInTheDocument();
+    expect(screen.getByPlaceholderText(/Enter URL to inspect/i)).toHaveValue('');
+    expect(screen.getByText(/Enter a URL to Inspect/i)).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /Inspect URL/i })).toBeInTheDocument();
   });
 
-  it('runs URL analysis when clicking Analyze URL & Function button', () => {
+  it('accurately inspects a clean searched URL with 0% threat score', async () => {
     render(<UrlInspector />);
-    const analyzeBtn = screen.getByText(/Analyze URL & Function/i);
-    fireEvent.click(analyzeBtn);
+    const urlInput = screen.getByPlaceholderText(/Enter URL to inspect/i);
+    fireEvent.change(urlInput, { target: { value: 'https://www.google.com/search?q=cybersecurity' } });
 
-    expect(screen.getByText(/URL & Session Safety Verdict/i)).toBeInTheDocument();
-    expect(screen.getByText(/Analyst Triage Reasons & Contributing Factors/i)).toBeInTheDocument();
+    const inspectBtn = screen.getByRole('button', { name: /Inspect URL/i });
+    fireEvent.click(inspectBtn);
+
+    await waitFor(() => {
+      expect(screen.getByText(/SAFE \/ LEGITIMATE/i)).toBeInTheDocument();
+      expect(screen.getAllByText(/ALLOW TRAFFIC/i).length).toBeGreaterThanOrEqual(1);
+      expect(screen.getAllByText(/0%/i).length).toBeGreaterThanOrEqual(1);
+      expect(screen.getByText(/URL Anatomy & Features/i)).toBeInTheDocument();
+      expect(screen.getByText(/Domain Intelligence/i)).toBeInTheDocument();
+    });
   });
 
-  it('analyzes entered custom URL when clicking analyze button', () => {
+  it('accurately detects a malicious phishing URL with high threat score and risk factors', async () => {
     render(<UrlInspector />);
-    const urlInput = screen.getByPlaceholderText(/Enter URL, domain, percent-encoded/i);
-    fireEvent.change(urlInput, { target: { value: 'http://secure-paypal-login.xyz/login.php' } });
+    const urlInput = screen.getByPlaceholderText(/Enter URL to inspect/i);
+    fireEvent.change(urlInput, { target: { value: 'http://secure-paypal-login.xyz/login.php?id=84920' } });
 
-    const analyzeBtn = screen.getByText(/Analyze URL & Function/i);
-    fireEvent.click(analyzeBtn);
+    const inspectBtn = screen.getByRole('button', { name: /Inspect URL/i });
+    fireEvent.click(inspectBtn);
 
-    expect(screen.getByText(/Unified Risk Score:/i)).toBeInTheDocument();
+    await waitFor(() => {
+      expect(screen.getByText(/MALICIOUS \/ PHISHING/i)).toBeInTheDocument();
+      expect(screen.getAllByText(/BLOCK IMMEDIATELY/i).length).toBeGreaterThanOrEqual(1);
+      expect(screen.getAllByText(/95%/i).length).toBeGreaterThanOrEqual(1);
+      expect(screen.getByText(/Identified Risk Factors/i)).toBeInTheDocument();
+      expect(screen.getAllByText(/Typosquatting brand spoofing detected/i).length).toBeGreaterThanOrEqual(1);
+    });
   });
 
-  it('switches between all multi-engine inspection tabs', () => {
+  it('removes preset selection tag when user types their own custom URL', () => {
     render(<UrlInspector />);
+    const c2Preset = screen.getByRole('button', { name: /Malicious C2/i });
+    fireEvent.click(c2Preset);
 
-    // Extraction & Normalizer Tab
-    const extractTab = screen.getByText(/Extraction & Normalizer/i);
-    fireEvent.click(extractTab);
-    expect(screen.getByText(/Extraction Layer & URL Normalization Workbench/i)).toBeInTheDocument();
+    expect(screen.getByText(/Sample Preset:/i)).toBeInTheDocument();
 
-    // Feature Matrix & Intel Tab
-    const featureTab = screen.getByText(/Feature Matrix & Intel/i);
-    fireEvent.click(featureTab);
-    expect(screen.getByText(/Multi-Category Feature Matrix & Domain Intelligence/i)).toBeInTheDocument();
+    const urlInput = screen.getByPlaceholderText(/Enter URL to inspect/i);
+    fireEvent.change(urlInput, { target: { value: 'https://openai.com' } });
 
-    // 2-Stage AI Classifier Tab
-    const aiTab = screen.getByText(/2-Stage AI Classifier/i);
-    fireEvent.click(aiTab);
-    expect(screen.getByText(/Two-Stage Classification Engine/i)).toBeInTheDocument();
-
-    // SIEM & Auto-Block Tab
-    const siemTab = screen.getByText(/SIEM & Auto-Block/i);
-    fireEvent.click(siemTab);
-    expect(screen.getByText(/SIEM \/ Alerting Integration & Firewall Auto-Block Hook/i)).toBeInTheDocument();
-
-    // Feedback & Drift Store Tab
-    const feedbackTab = screen.getByText(/Feedback & Drift Store/i);
-    fireEvent.click(feedbackTab);
-    expect(screen.getByText(/Analyst Feedback & Model Score Drift Store/i)).toBeInTheDocument();
-
-    // HTTP Attack Inspector Tab
-    const httpTab = screen.getByText(/HTTP Attack Inspector/i);
-    fireEvent.click(httpTab);
-    expect(screen.getByText(/HTTP Request Payload & Web Attack Detector/i)).toBeInTheDocument();
-
-    // Function & API Monitor Tab
-    const funcTab = screen.getByText(/Function & API Monitor/i);
-    fireEvent.click(funcTab);
-    expect(screen.getByText(/Win32 API & System Call Event Monitor/i)).toBeInTheDocument();
-
-    // API Explorer Tab
-    const apiTab = screen.getByText(/API Explorer/i);
-    fireEvent.click(apiTab);
-    expect(screen.getByText(/FastAPI Endpoint Tester/i)).toBeInTheDocument();
+    // Preset tag should be cleared
+    expect(screen.queryByText(/Sample Preset:/i)).not.toBeInTheDocument();
+    expect(urlInput.value).toBe('https://openai.com');
   });
 
-  it('allows submitting analyst feedback and triggering retraining pipeline', () => {
+  it('clears input and returns to empty state when clicking clear button', () => {
     render(<UrlInspector />);
+    const urlInput = screen.getByPlaceholderText(/Enter URL to inspect/i);
+    fireEvent.change(urlInput, { target: { value: 'https://example.com' } });
 
-    const feedbackTab = screen.getByText(/Feedback & Drift Store/i);
-    fireEvent.click(feedbackTab);
+    const clearBtn = screen.getByTitle(/Clear input/i);
+    fireEvent.click(clearBtn);
 
-    const retrainBtn = screen.getByText(/Trigger Retraining Pipeline/i);
-    fireEvent.click(retrainBtn);
+    expect(urlInput.value).toBe('');
+    expect(screen.getByText(/Enter a URL to Inspect/i)).toBeInTheDocument();
+  });
 
-    expect(screen.getByText(/Model retrained successfully with updated analyst feedback/i)).toBeInTheDocument();
+  it('automatically inspects target when passed via inspectTarget prop', () => {
+    render(<UrlInspector inspectTarget={{ value: 'http://xn--pple-43d.com/login' }} />);
+    const urlInput = screen.getByPlaceholderText(/Enter URL to inspect/i);
+    expect(urlInput.value).toBe('http://xn--pple-43d.com/login');
+    expect(screen.getByText(/Unified Threat Score:/i)).toBeInTheDocument();
   });
 });

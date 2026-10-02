@@ -47,3 +47,132 @@
 ::-webkit-scrollbar-thumb:hover {
   background: #00f0ff;
 }
+
+/* White (Light) Background Theme Support */
+html.light-mode {
+  color-scheme: light;
+}
+
+html.light-mode body {
+  background-color: #f8fafc !important;
+  background-image: none !important;
+  color: #0f172a !important;
+}
+
+html.light-mode aside {
+  background-color: #ffffff !important;
+  border-right-color: #e2e8f0 !important;
+}
+
+html.light-mode header {
+  background-color: #ffffff !important;
+  border-bottom-color: #e2e8f0 !important;
+}
+
+html.light-mode .bg-cyber-dark {
+  background-color: #f8fafc !important;
+}
+
+html.light-mode .bg-cyber-panel {
+  background-color: #ffffff !important;
+  border-color: #e2e8f0 !important;
+}
+
+html.light-mode .border-cyber-border,
+html.light-mode .border-cyber-border\/80,
+html.light-mode .border-cyber-border\/70,
+html.light-mode .border-cyber-border\/60,
+html.light-mode .border-cyber-border\/40 {
+  border-color: #e2e8f0 !important;
+}
+
+html.light-mode .glass-panel {
+  background-color: #ffffff !important;
+  border-color: #e2e8f0 !important;
+  box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.05), 0 2px 4px -2px rgb(0 0 0 / 0.05) !important;
+}
+
+html.light-mode .bg-black\/50,
+html.light-mode .bg-black\/40,
+html.light-mode .bg-black\/45,
+html.light-mode .bg-black\/30,
+html.light-mode .bg-black\/20 {
+  background-color: #f1f5f9 !important;
+  border-color: #e2e8f0 !important;
+}
+
+html.light-mode .text-white {
+  color: #0f172a !important;
+}
+
+html.light-mode .text-gray-200,
+html.light-mode .text-gray-300 {
+  color: #334155 !important;
+}
+
+html.light-mode .text-gray-400 {
+  color: #64748b !important;
+}
+
+html.light-mode .text-gray-500 {
+  color: #94a3b8 !important;
+}
+
+html.light-mode input,
+html.light-mode textarea,
+html.light-mode select {
+  background-color: #ffffff !important;
+  color: #0f172a !important;
+  border-color: #cbd5e1 !important;
+}
+
+html.light-mode input::placeholder {
+  color: #94a3b8 !important;
+}
+
+html.light-mode .divide-cyber-border\/40 > * + * {
+  border-color: #e2e8f0 !important;
+}
+
+html.light-mode ::-webkit-scrollbar-track {
+  background: #f1f5f9 !important;
+}
+
+html.light-mode ::-webkit-scrollbar-thumb {
+  background: #cbd5e1 !important;
+}
+
+html.light-mode ::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8 !important;
+}
+
+/* Light mode specific badge adjustments for readability on white background */
+html.light-mode .bg-red-500\/20,
+html.light-mode .bg-red-500\/15 {
+  background-color: #fef2f2 !important;
+  border-color: #fecaca !important;
+  color: #dc2626 !important;
+}
+
+html.light-mode .bg-green-500\/20,
+html.light-mode .bg-green-500\/15 {
+  background-color: #f0fdf4 !important;
+  border-color: #bbf7d0 !important;
+  color: #16a34a !important;
+}
+
+html.light-mode .bg-yellow-500\/20,
+html.light-mode .bg-yellow-500\/15 {
+  background-color: #fffbeb !important;
+  border-color: #fde68a !important;
+  color: #d97706 !important;
+}
+
+html.light-mode .bg-cyber-primary\/20,
+html.light-mode .bg-cyber-primary\/15,
+html.light-mode .bg-cyber-primary\/25,
+html.light-mode .bg-cyber-primary\/10 {
+  background-color: #f0f9ff !important;
+  border-color: #bae6fd !important;
+  color: #0284c7 !important;
+}

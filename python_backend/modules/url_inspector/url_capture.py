@@ -1,6 +1,6 @@
 import re
 import time
-from urllib.parse import urlparse, unquote, idna
+from urllib.parse import urlparse, unquote
 
 # In-memory deduplication cache: url_hash -> timestamp
 _DEDUPLICATION_WINDOW_SEC = 300
